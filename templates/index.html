@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Library Management System</title>
+  <!-- <link rel="stylesheet"  href="{{ url_for('static', filename='css/style.css') }}">> -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+  <header>
+    <h1>Library Management System</h1>
+  </header>
+
+  <main>
+    <!-- Add Book -->
+    <section class="card">
+      <h2>Add book</h2>
+      <form id="add-form">
+        <div class="row"><label>Book ID</label><input id="add-id" required /></div>
+        <div class="row"><label>Title</label><input id="add-title" required /></div>
+        <div class="row"><label>Author</label><input id="add-author" required /></div>
+        <button type="submit">Add</button>
+        <p id="add-msg" class="msg"></p>
+      </form>
+    </section>
+
+    <!-- Update Book -->
+    <section class="card">
+      <h2>Update book</h2>
+      <form id="update-form">
+        <div class="row"><label>Book ID</label><input id="upd-id" required /></div>
+        <div class="row"><label>New title</label><input id="upd-title" placeholder="(optional)" /></div>
+        <div class="row"><label>New author</label><input id="upd-author" placeholder="(optional)" /></div>
+        <button type="submit">Update</button>
+        <p id="update-msg" class="msg"></p>
+      </form>
+    </section>
+
+    <!-- Search Book -->
+    <section class="card">
+      <h2>Search book</h2>
+      <form id="search-form">
+        <div class="row"><label>Book ID</label><input id="search-id" required /></div>
+        <button type="submit">Search</button>
+        <pre id="search-result" class="msg"></pre>
+      </form>
+    </section>
+
+    <!-- List All Books -->
+    <section class="card">
+      <h2>All books</h2>
+      <div class="actions"><button id="refresh">Refresh list</button></div>
+      <table id="books-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <p id="list-msg" class="msg"></p>
+    </section>
+  </main>
+
+<script type="module" src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+
+</body>
+
+</html>
