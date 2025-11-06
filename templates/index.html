@@ -21,7 +21,7 @@
         <div class="row"><label>Book ID</label><input id="add-id" required /></div>
         <div class="row"><label>Title</label><input id="add-title" required /></div>
         <div class="row"><label>Author</label><input id="add-author" required /></div>
-        <button type="submit">Add</button>
+        <button type="submit" id="add-submit">Add Book</button>
         <p id="add-msg" class="msg"></p>
       </form>
     </section>
@@ -33,7 +33,7 @@
         <div class="row"><label>Book ID</label><input id="upd-id" required /></div>
         <div class="row"><label>New title</label><input id="upd-title" placeholder="(optional)" /></div>
         <div class="row"><label>New author</label><input id="upd-author" placeholder="(optional)" /></div>
-        <button type="submit">Update</button>
+        <button type="submit" id="update-submit">Update Book</button>
         <p id="update-msg" class="msg"></p>
       </form>
     </section>
@@ -43,7 +43,7 @@
       <h2>Search book</h2>
       <form id="search-form">
         <div class="row"><label>Book ID</label><input id="search-id" required /></div>
-        <button type="submit">Search</button>
+        <button type="submit" id="search-submit">Search</button>
         <pre id="search-result" class="msg"></pre>
       </form>
     </section>
@@ -51,7 +51,7 @@
     <!-- List All Books -->
     <section class="card">
       <h2>All books</h2>
-      <div class="actions"><button id="refresh">Refresh list</button></div>
+      <div class="actions"><button id="refresh">Refresh List</button></div>
       <table id="books-table">
         <thead>
           <tr>

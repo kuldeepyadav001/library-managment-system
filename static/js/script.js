@@ -1,125 +1,222 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Constants for messages and configurations
+  const CONFIG = {
+    messages: {
+      networkError: "Network error - Please check your connection",
+      invalidResponse: "Invalid server response",
+      deleteConfirm: "Are you sure you want to delete this book?",
+      loading: "Processing...",
+      required: "This field is required",
+      invalidId: "Book ID must be numeric",
+      success: {
+        add: "Book added successfully",
+        update: "Book updated successfully",
+        delete: "Book deleted successfully"
+      }
+    },
+    apiEndpoints: {
+      books: "/api/books"
+    }
+  };
+
+  // Input validation helpers
+  const validators = {
+    required: value => (value && value.trim()) ? null : CONFIG.messages.required,
+    numeric: value => /^\d+$/.test(value) ? null : CONFIG.messages.invalidId
+  };
+
+  function validateBook(id, title, author, requireAll = true) {
+    const errors = {};
+    if (requireAll || id) errors.id = validators.required(id) || validators.numeric(id);
+    if (requireAll || title) errors.title = validators.required(title);
+    if (requireAll || author) errors.author = validators.required(author);
+    return Object.values(errors).filter(Boolean);
+  }
+
+  // UI helpers
+  function setLoading(elementId, isLoading) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.disabled = isLoading;
+      if (isLoading) {
+        element.dataset.originalText = element.textContent;
+        element.textContent = CONFIG.messages.loading;
+      } else {
+        element.textContent = element.dataset.originalText || element.textContent;
+      }
+    }
+  }
+
+  function showMessage(elementId, message, isError = false) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.textContent = message;
+      element.className = `msg ${isError ? 'error' : 'success'}`;
+      setTimeout(() => element.textContent = '', 5000); // Clear after 5s
+    }
+  }
+
+  // API helpers
+  async function apiCall(endpoint, options = {}) {
+    try {
+      const response = await fetch(endpoint, {
+        headers: { 'Content-Type': 'application/json', ...options.headers },
+        ...options
+      });
+      const data = await response.json();
+      return { ok: response.ok, data };
+    } catch (error) {
+      console.error('API Error:', error);
+      throw new Error(CONFIG.messages.networkError);
+    }
+  }
+
   // --- Add Book ---
-  document.getElementById("add-form").addEventListener("submit", async (e) => {
+  document.getElementById("add-form")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const id = document.getElementById("add-id").value.trim();
     const title = document.getElementById("add-title").value.trim();
     const author = document.getElementById("add-author").value.trim();
 
+    const errors = validateBook(id, title, author);
+    if (errors.length) {
+      showMessage("add-msg", errors[0], true);
+      return;
+    }
+
+    setLoading("add-submit", true);
     try {
-      const res = await fetch("/api/books", {
+      const { ok, data } = await apiCall(CONFIG.apiEndpoints.books, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, title, author }),
+        body: JSON.stringify({ id, title, author })
       });
 
-      const data = await res.json().catch(() => ({ message: "Invalid response" }));
-      document.getElementById("add-msg").textContent = data.message || (res.ok ? "Added" : "Error");
-
-      if (res.ok) {
+      showMessage("add-msg", ok ? CONFIG.messages.success.add : data.message, !ok);
+      if (ok) {
         e.target.reset();
-        refreshList();
+        await refreshList();
       }
-    } catch (err) {
-      document.getElementById("add-msg").textContent = "Network error";
+    } catch (error) {
+      showMessage("add-msg", error.message, true);
+    } finally {
+      setLoading("add-submit", false);
     }
   });
 
   // --- Update Book ---
-  document.getElementById("update-form").addEventListener("submit", async (e) => {
+  document.getElementById("update-form")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const id = document.getElementById("upd-id").value.trim();
     const title = document.getElementById("upd-title").value.trim();
     const author = document.getElementById("upd-author").value.trim();
 
+    const errors = validateBook(id, false);
+    if (errors.length) {
+      showMessage("update-msg", errors[0], true);
+      return;
+    }
+
+    setLoading("update-submit", true);
     try {
-      const res = await fetch(`/api/books/${encodeURIComponent(id)}`, {
+      const { ok, data } = await apiCall(`${CONFIG.apiEndpoints.books}/${encodeURIComponent(id)}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title || undefined, author: author || undefined }),
+        body: JSON.stringify({ 
+          title: title || undefined, 
+          author: author || undefined 
+        })
       });
 
-      const data = await res.json().catch(() => ({ message: "Invalid response" }));
-      document.getElementById("update-msg").textContent = data.message || (res.ok ? "Updated" : "Error");
-
-      if (res.ok) {
+      showMessage("update-msg", ok ? CONFIG.messages.success.update : data.message, !ok);
+      if (ok) {
         e.target.reset();
-        refreshList();
+        await refreshList();
       }
-    } catch (err) {
-      document.getElementById("update-msg").textContent = "Network error";
+    } catch (error) {
+      showMessage("update-msg", error.message, true);
+    } finally {
+      setLoading("update-submit", false);
     }
   });
 
   // --- Search Book ---
-  document.getElementById("search-form").addEventListener("submit", async (e) => {
+  document.getElementById("search-form")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const id = document.getElementById("search-id").value.trim();
+    
+    const errors = validateBook(id, false);
+    if (errors.length) {
+      showMessage("search-result", errors[0], true);
+      return;
+    }
+
+    setLoading("search-submit", true);
     try {
-      const res = await fetch(`/api/books/${encodeURIComponent(id)}`);
-      const data = await res.json().catch(() => null);
-      const out = document.getElementById("search-result");
-      if (res.ok && data) {
-        out.textContent = JSON.stringify(data, null, 2);
-      } else {
-        out.textContent = (data && data.message) ? data.message : "Book not found";
-      }
-    } catch (err) {
-      document.getElementById("search-result").textContent = "Network error";
+      const { ok, data } = await apiCall(`${CONFIG.apiEndpoints.books}/${encodeURIComponent(id)}`);
+      const resultElement = document.getElementById("search-result");
+      resultElement.textContent = ok ? JSON.stringify(data, null, 2) : data.message;
+    } catch (error) {
+      showMessage("search-result", error.message, true);
+    } finally {
+      setLoading("search-submit", false);
     }
   });
 
   // --- Refresh List ---
-  document.getElementById("refresh").addEventListener("click", refreshList);
-
   async function refreshList() {
+    setLoading("refresh", true);
+    const tbody = document.querySelector("#books-table tbody");
+    
     try {
-      const res = await fetch("/api/books");
-      const books = await res.json().catch(() => []);
-      const tbody = document.querySelector("#books-table tbody");
-      tbody.innerHTML = "";
+      const { ok, data } = await apiCall(CONFIG.apiEndpoints.books);
+      if (!ok || !Array.isArray(data)) {
+        throw new Error(CONFIG.messages.invalidResponse);
+      }
 
-      books.forEach((book) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
+      tbody.innerHTML = data.map(book => `
+        <tr>
           <td>${escapeHtml(book.id)}</td>
           <td>${escapeHtml(book.title)}</td>
           <td>${escapeHtml(book.author)}</td>
-          <td><button data-id="${encodeURIComponent(book.id)}" class="delete-btn danger">Delete</button></td>
-        `;
-        tbody.appendChild(row);
-      });
+          <td>
+            <button data-id="${encodeURIComponent(book.id)}" class="delete-btn danger">Delete</button>
+          </td>
+        </tr>
+      `).join('');
 
       // Attach delete handlers
-      document.querySelectorAll(".delete-btn").forEach((btn) => {
-        btn.addEventListener("click", async () => {
-          const id = decodeURIComponent(btn.dataset.id);
-          try {
-            const res = await fetch(`/api/books/${encodeURIComponent(id)}`, { method: "DELETE" });
-            const data = await res.json().catch(() => ({ message: "Invalid response" }));
-            document.getElementById("list-msg").textContent = data.message || (res.ok ? "Deleted" : "Error");
-            if (res.ok) {
-              btn.closest("tr").remove();
-            }
-          } catch (err) {
-            document.getElementById("list-msg").textContent = "Network error";
-          }
-        });
-      });
-    } catch (err) {
-      document.getElementById("list-msg").textContent = "Failed to load books";
+      document.querySelectorAll(".delete-btn").forEach(attachDeleteHandler);
+    } catch (error) {
+      showMessage("list-msg", error.message, true);
+      tbody.innerHTML = '<tr><td colspan="4">Failed to load books</td></tr>';
+    } finally {
+      setLoading("refresh", false);
     }
   }
 
-  // simple html escape for table cells
-  function escapeHtml(s = "") {
-    return String(s)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
+  function attachDeleteHandler(btn) {
+    btn.addEventListener("click", async () => {
+      if (!confirm(CONFIG.messages.deleteConfirm)) return;
+      
+      const id = decodeURIComponent(btn.dataset.id);
+      setLoading(btn, true);
+      
+      try {
+        const { ok, data } = await apiCall(`${CONFIG.apiEndpoints.books}/${encodeURIComponent(id)}`, {
+          method: "DELETE"
+        });
+
+        showMessage("list-msg", ok ? CONFIG.messages.success.delete : data.message, !ok);
+        if (ok) {
+          btn.closest("tr").remove();
+        }
+      } catch (error) {
+        showMessage("list-msg", error.message, true);
+      } finally {
+        if (!ok) setLoading(btn, false);
+      }
+    });
   }
 
-  // initial load
+  // Initialize
   refreshList();
 });
