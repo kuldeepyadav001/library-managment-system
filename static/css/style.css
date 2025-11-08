@@ -1,11 +1,11 @@
 :root {
       --bg: #0f172a;
-      --card: #111827;
+      --card: #131a29;
       --text: #e5e7eb;
-      --muted: #9ca3af;
+      --muted: #e3e9f3;
       --accent: #22c55e;
       --danger: #ef4444;
-      --border: #1f2937;
+      --border: #8e9db3;
     }
 
     * {
@@ -21,12 +21,14 @@
 
     header {
       padding: 24px;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 5px solid var(--border);
     }
 
     h1 {
+      text-align: center;
+      font-family: 'Courier New', Courier, monospace;
       margin: 0;
-      font-size: 24px;
+      font-size: 30px;
     }
 
     main {
@@ -79,7 +81,7 @@
     }
 
     button:hover {
-      filter: brightness(1.1);
+      filter: brightness(1.5);
     }
 
     table {
