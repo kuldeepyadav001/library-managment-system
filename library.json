@@ -1,1 +1,27 @@
-[]
+[
+    {
+        "id": "101",
+        "title": "The Pragmatic",
+        "author": "David Thomas"
+    },
+    {
+        "id": "102",
+        "title": "Clean Code",
+        "author": "Robert C. Marti"
+    },
+    {
+        "id": "103",
+        "title": "Algorithms",
+        "author": "Thomas Cormen"
+    },
+    {
+        "id": "104",
+        "title": "Artificial Intelligence",
+        "author": "Peter Norvig"
+    },
+    {
+        "id": "105",
+        "title": "Crash Course",
+        "author": "Eric Matthes"
+    }
+]
