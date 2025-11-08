@@ -1,11 +1,13 @@
-:root {
-      --bg: #0f172a;
-      --card: #131a29;
-      --text: #e5e7eb;
-      --muted: #e3e9f3;
-      --accent: #22c55e;
-      --danger: #ef4444;
-      --border: #8e9db3;
+ :root {
+      --bg: #E5E5E5;        /* Light Gray background */
+      --card: #ffffff;      /* White cards */
+      --text: #2E2E2E;      /* Dark text */
+      --muted: #6B7280;     /* Muted gray for labels */
+      --accent: #89C2D9;    /* Soft Blue */
+      --danger: #ef4444;    /* Danger red */
+      --border: #A3B18A;    /* Soft Olive */
+      --header-gradient-start: #A3B18A; /* Soft Olive */
+      --header-gradient-end: #89C2D9;   /* Soft Blue */
     }
 
     * {
@@ -14,21 +16,48 @@
 
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: var(--bg);
       color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
+    /* Attractive Header */
     header {
       padding: 24px;
-      border-bottom: 5px solid var(--border);
+      border-bottom: 3px solid var(--border);
+      background: linear-gradient(90deg, var(--header-gradient-start), var(--header-gradient-end));
+      color: #fff;
+      text-align: center;
+      position: relative;
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      opacity: 0.4;
     }
 
     h1 {
-      text-align: center;
-      font-family: 'Courier New', Courier, monospace;
       margin: 0;
-      font-size: 30px;
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+
+    header p {
+      margin: 6px 0 0;
+      font-size: 16px;
+      font-style: italic;
+      color: #f0f0f0;
     }
 
     main {
@@ -36,6 +65,7 @@
       gap: 16px;
       padding: 16px;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      flex: 1;
     }
 
     .card {
@@ -43,36 +73,38 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
     .row {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      margin-bottom: 10px;
+      gap: 5px;
+      margin-bottom: 20px;
     }
 
     label {
       color: var(--muted);
-      font-size: 14px;
+      font-size: 16px;
     }
 
     input {
-      padding: 8px 10px;
+      padding: 10px 10px;
       border-radius: 8px;
       border: 1px solid var(--border);
-      background: #0b1020;
+      background: #f9fafb;
       color: var(--text);
     }
 
     button {
       background: var(--accent);
-      color: #052e1a;
-      padding: 8px 12px;
+      color: #fff;
+      padding: 9px 12px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
+      transition: 0.3s ease;
     }
 
     button.danger {
@@ -81,19 +113,20 @@
     }
 
     button:hover {
-      filter: brightness(1.5);
+      background: var(--border); /* Soft Olive hover */
+      color: #fff;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 8px;
+      margin-top: 10px;
     }
 
     th,
     td {
       border-bottom: 1px solid var(--border);
-      padding: 8px;
+      padding: 10px;
       text-align: left;
     }
 
@@ -101,12 +134,12 @@
       padding: 10px;
       margin: 10px 0;
       border-radius: 4px;
-      color: var(--muted);
+      color: var(--text);
       white-space: pre-wrap;
     }
 
     pre.msg {
-      background: #0b1020;
+      background: #f3f4f6;
       padding: 8px;
       border-radius: 8px;
     }
@@ -123,4 +156,13 @@
 
     .actions {
       margin-bottom: 6px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 18px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      background-color: var(--bg);
+      padding: 8px;
     }
